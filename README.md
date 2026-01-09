@@ -1,4 +1,4 @@
-# Replace OpenAI key with Gemini key
+# Create a .env file in your project directory and Replace Gemini key with your own key
 GEMINI_API_KEY= 
 PORT=3000
 NODE_ENV=development
