@@ -1,0 +1,229 @@
+{
+  "hotel": {
+    "hotel_name": "CANNOPY BY SMARTLUTH",
+    "basic_info": {
+      "name": "Grand Lotus Residency",
+      "brand": "Grand Lotus",
+      "category": "5-star",
+      "property_type": "Hotel",
+      "year_opened": 2018,
+      "last_renovated": 2023
+    },
+
+    "location": {
+      "address": {
+        "line1": "Plot 45, Sector V",
+        "line2": "Salt Lake City",
+        "city": "Kolkata",
+        "district": "North 24 Parganas",
+        "state": "West Bengal",
+        "country": "India",
+        "postal_code": "700091"
+      },
+      "coordinates": {
+        "latitude": 22.572645,
+        "longitude": 88.363892
+      },
+      "nearby_landmarks": [
+        {
+          "name": "Sector V Metro Station",
+          "distance_km": 0.8
+        },
+        {
+          "name": "Salt Lake Stadium",
+          "distance_km": 4.2
+        },
+        {
+          "name": "Netaji Subhas Chandra Bose International Airport",
+          "distance_km": 12.5
+        }
+      ]
+    },
+
+    "contact": {
+      "phone": "+91-33-44556677",
+      "email": "reservations@grandlotusresidency.com",
+      "website": "https://www.grandlotusresidency.com"
+    },
+
+    "checkin_checkout": {
+      "check_in_time": "14:00",
+      "check_out_time": "12:00",
+      "early_checkin_policy": "Subject to availability, extra charges may apply",
+      "late_checkout_policy": "Charged at 50% of daily rate after 2 PM"
+    },
+
+    "rooms": [
+      {
+        "room_type_id": "DLX_001",
+        "room_name": "Deluxe Room",
+        "description": "Spacious room with city view and modern interiors",
+        "bed_type": "King Bed",
+        "max_occupancy": {
+          "adults": 2,
+          "children": 1
+        },
+        "room_size_sqft": 320,
+        "amenities": [
+          "Air Conditioning",
+          "Free Wi-Fi",
+          "Smart TV",
+          "Mini Bar",
+          "Tea/Coffee Maker",
+          "In-room Safe"
+        ],
+        "pricing": {
+          "currency": "INR",
+          "base_price_per_night": 5200,
+          "taxes": {
+            "gst_percentage": 12,
+            "service_charge_percentage": 5
+          },
+          "total_price_estimate": 6084
+        },
+        "availability": [
+          {
+            "date": "2026-01-10",
+            "available_rooms": 8,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-11",
+            "available_rooms": 2,
+            "status": "limited"
+          },
+          {
+            "date": "2026-01-12",
+            "available_rooms": 0,
+            "status": "sold_out"
+          }
+        ]
+      },
+      {
+        "room_type_id": "EXEC_002",
+        "room_name": "Executive Suite",
+        "description": "Luxury suite with separate living area",
+        "bed_type": "King Bed",
+        "max_occupancy": {
+          "adults": 3,
+          "children": 1
+        },
+        "room_size_sqft": 550,
+        "amenities": [
+          "Air Conditioning",
+          "Free Wi-Fi",
+          "Smart TV",
+          "Mini Bar",
+          "Bathtub",
+          "Work Desk",
+          "Complimentary Breakfast"
+        ],
+        "pricing": {
+          "currency": "INR",
+          "base_price_per_night": 8900,
+          "taxes": {
+            "gst_percentage": 18,
+            "service_charge_percentage": 5
+          },
+          "total_price_estimate": 11205
+        },
+        "availability": [
+          {
+            "date": "2026-01-10",
+            "available_rooms": 3,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-11",
+            "available_rooms": 1,
+            "status": "limited"
+          }
+        ]
+      }
+    ],
+
+    "facilities": {
+      "general": [
+        "24-hour Front Desk",
+        "Elevator",
+        "Power Backup",
+        "Wheelchair Accessible"
+      ],
+      "food_and_beverage": [
+        {
+          "name": "Lotus Garden Restaurant",
+          "type": "Multi-cuisine",
+          "opening_hours": "07:00 - 23:00"
+        },
+        {
+          "name": "Sky Lounge Bar",
+          "type": "Bar",
+          "opening_hours": "17:00 - 01:00"
+        }
+      ],
+      "wellness": [
+        "Gym",
+        "Spa",
+        "Swimming Pool"
+      ],
+      "business_services": [
+        "Conference Room",
+        "Banquet Hall",
+        "Business Center"
+      ]
+    },
+
+    "policies": {
+      "cancellation": {
+        "free_cancellation_before_hours": 48,
+        "cancellation_fee_after": "1 night charge"
+      },
+      "child_policy": {
+        "children_below_age_free": 6,
+        "extra_bed_charge": 1200
+      },
+      "pet_policy": "Pets not allowed",
+      "id_proof_required": true,
+      "accepted_id_types": [
+        "Aadhaar",
+        "Passport",
+        "Driving License",
+        "Voter ID"
+      ]
+    },
+
+    "payments": {
+      "accepted_methods": [
+        "Credit Card",
+        "Debit Card",
+        "UPI",
+        "Net Banking",
+        "Cash"
+      ],
+      "supported_cards": [
+        "Visa",
+        "Mastercard",
+        "RuPay",
+        "American Express"
+      ]
+    },
+
+    "ratings_and_reviews": {
+      "average_rating": 4.4,
+      "rating_scale": 5,
+      "total_reviews": 1826,
+      "review_summary": {
+        "cleanliness": 4.6,
+        "location": 4.3,
+        "service": 4.5,
+        "value_for_money": 4.2
+      }
+    },
+
+    "meta": {
+      "data_source": "internal_pms",
+      "last_updated": "2026-01-08T10:45:00+05:30",
+      "timezone": "Asia/Kolkata"
+    }
+  }
+}
