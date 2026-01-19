@@ -2,94 +2,200 @@
   "hotel": {
     "hotel_name": "CANNOPY BY SMARTLUTH",
     "basic_info": {
-      "name": "Grand Lotus Residency",
-      "brand": "Grand Lotus",
-      "category": "5-star",
-      "property_type": "Hotel",
-      "year_opened": 2018,
-      "last_renovated": 2023
+      "name": "Canopy By Smartluth",
+      "brand": "Smartluth Hotels",
+      "category": "4-star",
+      "property_type": "Boutique Hotel",
+      "year_opened": 2022,
+      "last_renovated": 2024
     },
-
+    
     "location": {
       "address": {
-        "line1": "Plot 45, Sector V",
-        "line2": "Salt Lake City",
-        "city": "Kolkata",
-        "district": "North 24 Parganas",
+        "line1": "Opposite Off Glenary's",
+        "line2": "Darjeeling Mall Road",
+        "city": "Darjeeling",
+        "district": "Darjeeling",
         "state": "West Bengal",
         "country": "India",
-        "postal_code": "700091"
+        "postal_code": "734101"
       },
       "coordinates": {
-        "latitude": 22.572645,
-        "longitude": 88.363892
+        "latitude": 27.0379,
+        "longitude": 88.2631
       },
       "nearby_landmarks": [
         {
-          "name": "Sector V Metro Station",
-          "distance_km": 0.8
+          "name": "Darjeeling Mall Road",
+          "distance_km": 0.1
         },
         {
-          "name": "Salt Lake Stadium",
-          "distance_km": 4.2
+          "name": "Glenary's Restaurant",
+          "distance_km": 0.05
         },
         {
-          "name": "Netaji Subhas Chandra Bose International Airport",
-          "distance_km": 12.5
+          "name": "Darjeeling Railway Station",
+          "distance_km": 1.2
+        },
+        {
+          "name": "Tiger Hill",
+          "distance_km": 8.5
         }
-      ]
+      ],
+      "description": "Located at the heart of Darjeeling on Mall Road with panoramic mountain views"
     },
-
+    
     "contact": {
-      "phone": "+91-33-44556677",
-      "email": "reservations@grandlotusresidency.com",
-      "website": "https://www.grandlotusresidency.com"
+      "phone": "+91-9876543210",
+      "email": "reservations@canopysmartluth.com",
+      "website": "https://www.canopysmartluth.com"
     },
-
+    
     "checkin_checkout": {
-      "check_in_time": "14:00",
-      "check_out_time": "12:00",
+      "check_in_time": "13:00",
+      "check_out_time": "11:00",
       "early_checkin_policy": "Subject to availability, extra charges may apply",
-      "late_checkout_policy": "Charged at 50% of daily rate after 2 PM"
+      "late_checkout_policy": "Charged at 50% of daily rate after 1 PM"
     },
-
+    
     "rooms": [
       {
-        "room_type_id": "DLX_001",
-        "room_name": "Deluxe Room",
-        "description": "Spacious room with city view and modern interiors",
+        "room_type_id": "EXEC_VIEW_001",
+        "room_name": "Executive Suite View",
+        "description": "Executive suite with stunning mountain views, balcony",
         "bed_type": "King Bed",
         "max_occupancy": {
           "adults": 2,
           "children": 1
         },
-        "room_size_sqft": 320,
+        "room_size_sqft": 400,
+        "view_type": "Mountain View",
         "amenities": [
           "Air Conditioning",
           "Free Wi-Fi",
           "Smart TV",
           "Mini Bar",
           "Tea/Coffee Maker",
-          "In-room Safe"
+          "In-room Safe",
+          "Private Balcony",
+          "Mountain View",
+          "Heating"
         ],
         "pricing": {
           "currency": "INR",
-          "base_price_per_night": 5200,
+          "base_price_per_night": 7500,
           "taxes": {
             "gst_percentage": 12,
             "service_charge_percentage": 5
           },
-          "total_price_estimate": 6084
+          "total_price_estimate": 8775
         },
         "availability": [
           {
             "date": "2026-01-10",
-            "available_rooms": 8,
+            "available_rooms": 3,
             "status": "available"
           },
           {
             "date": "2026-01-11",
             "available_rooms": 2,
+            "status": "limited"
+          },
+          {
+            "date": "2026-01-12",
+            "available_rooms": 1,
+            "status": "limited"
+          }
+        ]
+      },
+      {
+        "room_type_id": "EXEC_NON_002",
+        "room_name": "Executive Suite Non-View",
+        "description": "Executive suite without view, premium interior",
+        "bed_type": "King Bed",
+        "max_occupancy": {
+          "adults": 2,
+          "children": 1
+        },
+        "room_size_sqft": 380,
+        "view_type": "No View",
+        "amenities": [
+          "Air Conditioning",
+          "Free Wi-Fi",
+          "Smart TV",
+          "Mini Bar",
+          "Tea/Coffee Maker",
+          "In-room Safe",
+          "Heating"
+        ],
+        "pricing": {
+          "currency": "INR",
+          "base_price_per_night": 5800,
+          "taxes": {
+            "gst_percentage": 12,
+            "service_charge_percentage": 5
+          },
+          "total_price_estimate": 6786
+        },
+        "availability": [
+          {
+            "date": "2026-01-10",
+            "available_rooms": 5,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-11",
+            "available_rooms": 4,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-12",
+            "available_rooms": 3,
+            "status": "available"
+          }
+        ]
+      },
+      {
+        "room_type_id": "FAM_VIEW_003",
+        "room_name": "Family Suite View",
+        "description": "Family suite with mountain views, extra space",
+        "bed_type": "King Bed + Twin Bed",
+        "max_occupancy": {
+          "adults": 3,
+          "children": 2
+        },
+        "room_size_sqft": 550,
+        "view_type": "Mountain View",
+        "amenities": [
+          "Air Conditioning",
+          "Free Wi-Fi",
+          "Smart TV",
+          "Mini Bar",
+          "Tea/Coffee Maker",
+          "In-room Safe",
+          "Private Balcony",
+          "Mountain View",
+          "Heating",
+          "Extra Bed Available"
+        ],
+        "pricing": {
+          "currency": "INR",
+          "base_price_per_night": 9500,
+          "taxes": {
+            "gst_percentage": 12,
+            "service_charge_percentage": 5
+          },
+          "total_price_estimate": 11115
+        },
+        "availability": [
+          {
+            "date": "2026-01-10",
+            "available_rooms": 2,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-11",
+            "available_rooms": 1,
             "status": "limited"
           },
           {
@@ -100,89 +206,197 @@
         ]
       },
       {
-        "room_type_id": "EXEC_002",
-        "room_name": "Executive Suite",
-        "description": "Luxury suite with separate living area",
-        "bed_type": "King Bed",
+        "room_type_id": "FAM_NON_004",
+        "room_name": "Family Suite Non-View",
+        "description": "Family suite without view, spacious layout",
+        "bed_type": "King Bed + Twin Bed",
         "max_occupancy": {
           "adults": 3,
-          "children": 1
+          "children": 2
         },
-        "room_size_sqft": 550,
+        "room_size_sqft": 520,
+        "view_type": "No View",
         "amenities": [
           "Air Conditioning",
           "Free Wi-Fi",
           "Smart TV",
           "Mini Bar",
-          "Bathtub",
-          "Work Desk",
-          "Complimentary Breakfast"
+          "Tea/Coffee Maker",
+          "In-room Safe",
+          "Heating",
+          "Extra Bed Available"
         ],
         "pricing": {
           "currency": "INR",
-          "base_price_per_night": 8900,
+          "base_price_per_night": 7200,
           "taxes": {
-            "gst_percentage": 18,
+            "gst_percentage": 12,
             "service_charge_percentage": 5
           },
-          "total_price_estimate": 11205
+          "total_price_estimate": 8424
         },
         "availability": [
           {
             "date": "2026-01-10",
-            "available_rooms": 3,
+            "available_rooms": 4,
             "status": "available"
           },
           {
             "date": "2026-01-11",
-            "available_rooms": 1,
+            "available_rooms": 3,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-12",
+            "available_rooms": 2,
             "status": "limited"
+          }
+        ]
+      },
+      {
+        "room_type_id": "JUNIOR_VIEW_005",
+        "room_name": "Junior Suite View",
+        "description": "Junior suite with partial mountain views",
+        "bed_type": "Queen Bed",
+        "max_occupancy": {
+          "adults": 2,
+          "children": 1
+        },
+        "room_size_sqft": 350,
+        "view_type": "Partial Mountain View",
+        "amenities": [
+          "Air Conditioning",
+          "Free Wi-Fi",
+          "Smart TV",
+          "Mini Bar",
+          "Tea/Coffee Maker",
+          "In-room Safe",
+          "Heating",
+          "Window View"
+        ],
+        "pricing": {
+          "currency": "INR",
+          "base_price_per_night": 6500,
+          "taxes": {
+            "gst_percentage": 12,
+            "service_charge_percentage": 5
+          },
+          "total_price_estimate": 7605
+        },
+        "availability": [
+          {
+            "date": "2026-01-10",
+            "available_rooms": 6,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-11",
+            "available_rooms": 4,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-12",
+            "available_rooms": 2,
+            "status": "limited"
+          }
+        ]
+      },
+      {
+        "room_type_id": "JUNIOR_NON_006",
+        "room_name": "Junior Suite Non-View",
+        "description": "Junior suite without view, comfortable stay",
+        "bed_type": "Queen Bed",
+        "max_occupancy": {
+          "adults": 2,
+          "children": 1
+        },
+        "room_size_sqft": 320,
+        "view_type": "No View",
+        "amenities": [
+          "Air Conditioning",
+          "Free Wi-Fi",
+          "Smart TV",
+          "Mini Bar",
+          "Tea/Coffee Maker",
+          "In-room Safe",
+          "Heating"
+        ],
+        "pricing": {
+          "currency": "INR",
+          "base_price_per_night": 4800,
+          "taxes": {
+            "gst_percentage": 12,
+            "service_charge_percentage": 5
+          },
+          "total_price_estimate": 5616
+        },
+        "availability": [
+          {
+            "date": "2026-01-10",
+            "available_rooms": 8,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-11",
+            "available_rooms": 7,
+            "status": "available"
+          },
+          {
+            "date": "2026-01-12",
+            "available_rooms": 6,
+            "status": "available"
           }
         ]
       }
     ],
-
+    
     "facilities": {
       "general": [
         "24-hour Front Desk",
         "Elevator",
         "Power Backup",
-        "Wheelchair Accessible"
+        "Wheelchair Accessible",
+        "Central Heating"
       ],
       "food_and_beverage": [
         {
-          "name": "Lotus Garden Restaurant",
+          "name": "Mountain View Restaurant",
           "type": "Multi-cuisine",
-          "opening_hours": "07:00 - 23:00"
+          "opening_hours": "07:00 - 22:30"
         },
         {
-          "name": "Sky Lounge Bar",
-          "type": "Bar",
-          "opening_hours": "17:00 - 01:00"
+          "name": "Tea Lounge",
+          "type": "Cafe",
+          "opening_hours": "08:00 - 20:00"
         }
       ],
       "wellness": [
         "Gym",
         "Spa",
-        "Swimming Pool"
+        "Hot Water Supply"
       ],
       "business_services": [
         "Conference Room",
-        "Banquet Hall",
         "Business Center"
+      ],
+      "special_features": [
+        "Mountain Facing Rooms",
+        "Fireplace Lounge",
+        "Library",
+        "Trekking Assistance"
       ]
     },
-
+    
     "policies": {
       "cancellation": {
-        "free_cancellation_before_hours": 48,
-        "cancellation_fee_after": "1 night charge"
+        "free_cancellation_before_hours": 72,
+        "cancellation_fee_after": "2 nights charge"
       },
       "child_policy": {
-        "children_below_age_free": 6,
-        "extra_bed_charge": 1200
+        "children_below_age_free": 8,
+        "extra_bed_charge": 1500
       },
-      "pet_policy": "Pets not allowed",
+      "pet_policy": "Pets allowed with prior permission",
       "id_proof_required": true,
       "accepted_id_types": [
         "Aadhaar",
@@ -191,7 +405,7 @@
         "Voter ID"
       ]
     },
-
+    
     "payments": {
       "accepted_methods": [
         "Credit Card",
@@ -203,27 +417,27 @@
       "supported_cards": [
         "Visa",
         "Mastercard",
-        "RuPay",
-        "American Express"
+        "RuPay"
       ]
     },
-
+    
     "ratings_and_reviews": {
-      "average_rating": 4.4,
+      "average_rating": 4.6,
       "rating_scale": 5,
-      "total_reviews": 1826,
+      "total_reviews": 1248,
       "review_summary": {
-        "cleanliness": 4.6,
-        "location": 4.3,
+        "cleanliness": 4.8,
+        "location": 4.9,
         "service": 4.5,
-        "value_for_money": 4.2
+        "value_for_money": 4.4
       }
     },
-
+    
     "meta": {
       "data_source": "internal_pms",
       "last_updated": "2026-01-08T10:45:00+05:30",
-      "timezone": "Asia/Kolkata"
+      "timezone": "Asia/Kolkata",
+      "season": "Peak (October - March)"
     }
   }
 }

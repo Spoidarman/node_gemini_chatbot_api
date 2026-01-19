@@ -127,19 +127,65 @@ export class HotelService {
     };
   }
 
-  private findRoomByType(roomType: string): RoomType | undefined {
-    const type = roomType.toLowerCase();
-    
-    if (type.includes('delux') || type.includes('single') || type.includes('standard')) {
-      return this.hotelData.rooms.find((r: any) => r.room_type_id === 'DLX_001');
-    }
-    
-    if (type.includes('exec') || type.includes('suite') || type.includes('double')) {
-      return this.hotelData.rooms.find((r: any) => r.room_type_id === 'EXEC_002');
-    }
-
-    return this.hotelData.rooms[0];
+ // Update the findRoomByType method in HotelService
+private findRoomByType(roomType: string): RoomType | undefined {
+  const type = roomType.toLowerCase();
+  
+  // Map UI room types to data room types
+  const roomTypeMapping: Record<string, string> = {
+    'executive-view': 'EXEC_VIEW_001',
+    'executive-non-view': 'EXEC_NON_002',
+    'family-view': 'FAM_VIEW_003',
+    'family-non-view': 'FAM_NON_004',
+    'junior-view': 'JUNIOR_VIEW_005',
+    'junior-non-view': 'JUNIOR_NON_006'
+  };
+  
+  // Check for exact match from UI
+  if (roomTypeMapping[roomType]) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === roomTypeMapping[roomType]);
   }
+  
+  // Fallback to keyword matching
+  if (type.includes('executive') && type.includes('view')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'EXEC_VIEW_001');
+  }
+  
+  if (type.includes('executive') && type.includes('non')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'EXEC_NON_002');
+  }
+  
+  if (type.includes('family') && type.includes('view')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'FAM_VIEW_003');
+  }
+  
+  if (type.includes('family') && type.includes('non')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'FAM_NON_004');
+  }
+  
+  if (type.includes('junior') && type.includes('view')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'JUNIOR_VIEW_005');
+  }
+  
+  if (type.includes('junior') && type.includes('non')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'JUNIOR_NON_006');
+  }
+  
+  if (type.includes('executive')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'EXEC_VIEW_001');
+  }
+  
+  if (type.includes('family')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'FAM_NON_004');
+  }
+  
+  if (type.includes('junior')) {
+    return this.hotelData.rooms.find((r: any) => r.room_type_id === 'JUNIOR_NON_006');
+  }
+  
+  // Default to first room
+  return this.hotelData.rooms[0];
+}
 
   private checkDateRangeAvailability(
     checkIn: string,

@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Booking Assistant</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
+
 <body>
-    <div class="container">
+
+    <button class="chat-toggle-btn" id="chat-toggle-btn">
+        <i class="fa-brands fa-uncharted"></i>
+    </button>
+
+    <div class="container" id="chat-container-main">
         <!-- Chat Header -->
         <div class="chat-header">
             <div class="header-left">
                 <div class="bot-avatar">
-                    <i class="fas fa-robot"></i>
+                    <i class="fa-brands fa-uncharted"></i>
                 </div>
                 <div class="header-info">
-                    <h1>Hotel Booking Assistant</h1>
+                    <h1>CAYA - Booking Assistant</h1>
                     <p class="status">
                         <span class="status-dot"></span>
                         <span id="status-text">Online</span>
@@ -29,6 +37,9 @@
                 </button>
                 <button class="header-btn" id="clear-btn" title="Clear Chat">
                     <i class="fas fa-trash-alt"></i>
+                </button>
+                <button class="header-btn" id="close-btn" title="Close Chat">
+                    <i class="fas fa-xmark"></i>
                 </button>
             </div>
         </div>
@@ -82,12 +93,7 @@
                 <button class="attach-btn" title="Quick Actions">
                     <i class="fas fa-plus"></i>
                 </button>
-                <input 
-                    type="text" 
-                    id="user-input" 
-                    placeholder="Type your message here..." 
-                    autocomplete="off"
-                />
+                <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off" />
                 <button class="send-btn" id="send-btn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -108,13 +114,41 @@
             </div>
         </div>
     </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle"></i>
-        <span id="toast-message"></span>
+    <template id="date-picker-template">
+    <div class="chat-date-picker compact">
+        <div class="date-range-section">
+            <div class="date-range-label">
+                <i class="fas fa-calendar-day"></i>
+                <span>Dates*</span>
+            </div>
+            <input type="text" class="date-range-input compact-input" id="date-range-input"
+                   placeholder="Click to select dates">
+        </div>
+        <div class="room-type-section">
+            <div class="room-type-label">
+                <i class="fas fa-bed"></i>
+                <span>Room Type:</span>
+            </div>
+            <div class="room-grid compact-grid">
+                <button class="room-type-btn compact-btn" data-type="executive-view">Executive View</button>
+                <button class="room-type-btn compact-btn" data-type="executive-non-view">Executive Non-View</button>
+                <button class="room-type-btn compact-btn" data-type="family-view">Family View</button>
+                <button class="room-type-btn compact-btn" data-type="family-non-view">Family Non-View</button>
+                <button class="room-type-btn compact-btn" data-type="junior-view">Junior View</button>
+                <button class="room-type-btn compact-btn" data-type="junior-non-view">Junior Non-View</button>
+            </div>
+        </div>
+        <div class="check-availability-container">
+            <button class="check-availability-btn">
+                <i class="fas fa-search"></i>
+                <span>Check Availability</span>
+            </button>
+        </div>
     </div>
+</template>
 
     <script src="/js/chat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
+
 </html>

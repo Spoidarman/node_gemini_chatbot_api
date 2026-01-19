@@ -66,4 +66,5 @@ export interface ChatResponse {
   reply: string;
   conversationHistory: ChatMessage[];
   dataSource?: 'api' | 'cache' | 'fallback';
+  showDatePicker?: boolean;
 }
