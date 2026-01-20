@@ -4,22 +4,35 @@ class HotelChatbot {
         this.userInput = document.getElementById('user-input');
         this.sendBtn = document.getElementById('send-btn');
         this.typingIndicator = document.getElementById('typing-indicator');
-        this.datePickerShown = false;
 
         this.conversationHistory = [];
         this.apiUrl = '/api/chat';
 
-        // Store the current date picker instance
-        this.currentDatePicker = null;
+        // Voice recognition
+        this.isListening = false;
+        this.speechRecognition = null;
+        this.voiceStatusElement = null;
+        this.voiceAnimation = null;
 
-        // Add flatpickr for date range
+        // Date picker
+        this.currentDatePicker = null;
         this.flatpickrInstance = null;
 
         this.init();
     }
 
     init() {
+        // Initialize voice recognition
+        this.initVoiceRecognition();
+
+        // Event listeners
+        const micBtn = document.getElementById('mic-btn');
+        if (micBtn) {
+            micBtn.addEventListener('click', () => this.toggleVoiceRecognition());
+        }
+
         this.sendBtn.addEventListener('click', () => this.sendMessage());
+
         this.userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -27,9 +40,9 @@ class HotelChatbot {
             }
         });
 
+        // Other event listeners
         document.getElementById('clear-btn').addEventListener('click', () => this.clearChat());
         document.getElementById('refresh-btn').addEventListener('click', () => this.refreshData());
-
         document.querySelector('.attach-btn').addEventListener('click', () => this.toggleQuickActions());
 
         document.querySelectorAll('.quick-action').forEach(btn => {
@@ -40,7 +53,6 @@ class HotelChatbot {
                 this.toggleQuickActions();
             });
         });
-
 
         document.getElementById('chat-toggle-btn').addEventListener('click', () => {
             const container = document.getElementById('chat-container-main');
@@ -55,29 +67,320 @@ class HotelChatbot {
             }
         });
 
-        // close the chat
         document.getElementById('close-btn').addEventListener('click', () => {
             this.closeChat();
         });
+
+        // Keyboard shortcuts
+        this.setupKeyboardShortcuts();
     }
 
-    closeChat() {
-        const container = document.getElementById('chat-container-main');
-        const toggleBtn = document.getElementById('chat-toggle-btn');
+    // ============ VOICE RECOGNITION METHODS ============
 
-        // Hide the chat container
-        container.classList.remove('open');
+    initVoiceRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        // Reset the toggle button icon
-        toggleBtn.innerHTML = '<i class="fa-brands fa-uncharted"></i>';
+        if (!SpeechRecognition) {
+            document.getElementById('mic-btn').style.display = 'none';
+            console.warn('Voice recognition not supported');
+            return;
+        }
 
-        // Optional: Show a toast notification
-        this.showToast('Chat closed. Click the icon to open again.');
+        this.speechRecognition = new SpeechRecognition();
+        this.speechRecognition.continuous = true;
+        this.speechRecognition.interimResults = true;
+        this.speechRecognition.lang = 'en-US';
+        this.speechRecognition.maxAlternatives = 1;
+
+        // Add a timer to auto-send after silence
+        this.silenceTimer = null;
+        this.silenceTimeout = 1500; // 1.5 seconds of silence
+
+        this.speechRecognition.onstart = () => {
+            this.isListening = true;
+            this.updateMicButton(true);
+            this.showVoiceStatus('listening', '🎤 Listening... Speak now');
+            this.startVoiceAnimation();
+        };
+
+        this.speechRecognition.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            // Update input field with what's being said
+            if (interimTranscript) {
+                this.userInput.value = interimTranscript;
+                this.updateVoiceTranscript(interimTranscript);
+
+                // Reset silence timer
+                this.resetSilenceTimer();
+            }
+
+            // When final transcript is ready
+            if (finalTranscript) {
+                this.userInput.value = finalTranscript;
+                this.updateVoiceTranscript(`"${finalTranscript}"`);
+
+                // Stop voice recognition immediately
+                this.stopVoiceRecognition();
+
+                // Show sending status briefly, then send
+                this.showVoiceStatus('ready', '✅ Sending...');
+                setTimeout(() => {
+                    this.sendMessage();
+                    this.removeVoiceStatus();
+                }, 500);
+            }
+        };
+
+        this.speechRecognition.onerror = (event) => {
+            console.error('Voice recognition error:', event.error);
+            this.stopVoiceRecognition();
+
+            let errorMsg = 'Voice input failed';
+            if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+                errorMsg = 'Microphone access denied';
+            } else if (event.error === 'no-speech') {
+                errorMsg = 'No speech detected';
+            }
+
+            this.showVoiceStatus('error', `❌ ${errorMsg}`);
+            setTimeout(() => this.removeVoiceStatus(), 3000);
+        };
+
+        this.speechRecognition.onend = () => {
+            if (this.isListening) {
+                try {
+                    this.speechRecognition.start();
+                } catch (e) {
+                    this.stopVoiceRecognition();
+                }
+            }
+        };
     }
+
+    toggleVoiceRecognition() {
+        if (!this.speechRecognition) {
+            this.showToast('Voice recognition not supported', 'error');
+            return;
+        }
+
+        if (this.isListening) {
+            // User manually stops - only send if there's text
+            this.stopVoiceRecognition();
+            if (this.userInput.value.trim()) {
+                this.showVoiceStatus('ready', '✅ Sending...');
+                setTimeout(() => {
+                    this.sendMessage();
+                    this.removeVoiceStatus();
+                }, 500);
+            } else {
+                this.removeVoiceStatus();
+            }
+        } else {
+            // Start listening
+            this.userInput.value = '';
+            this.startVoiceRecognition();
+        }
+    }
+
+    resetSilenceTimer() {
+        // Clear existing timer
+        if (this.silenceTimer) {
+            clearTimeout(this.silenceTimer);
+        }
+
+        // Set new timer
+        this.silenceTimer = setTimeout(() => {
+            if (this.isListening && this.userInput.value.trim()) {
+                // Auto-send after silence
+                this.stopVoiceRecognition();
+                this.showVoiceStatus('ready', '✅ Auto-sending...');
+                setTimeout(() => {
+                    this.sendMessage();
+                    this.removeVoiceStatus();
+                }, 500);
+            }
+        }, this.silenceTimeout);
+    }
+
+    startVoiceRecognition() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(() => {
+                try {
+                    this.speechRecognition.start();
+                } catch (error) {
+                    this.showToast('Failed to start voice input', 'error');
+                }
+            })
+            .catch(error => {
+                this.showToast('Please allow microphone access', 'error');
+            });
+    }
+
+    stopVoiceRecognition() {
+        if (this.speechRecognition && this.isListening) {
+            // Clear silence timer
+            if (this.silenceTimer) {
+                clearTimeout(this.silenceTimer);
+                this.silenceTimer = null;
+            }
+
+            try {
+                this.speechRecognition.stop();
+            } catch (error) {
+                console.error('Error stopping recognition:', error);
+            }
+            this.isListening = false;
+            this.updateMicButton(false);
+            this.stopVoiceAnimation();
+        }
+    }
+
+    updateMicButton(listening) {
+        const micBtn = document.getElementById('mic-btn');
+        const micIcon = micBtn.querySelector('i');
+
+        if (listening) {
+            micBtn.classList.add('listening');
+            micIcon.className = 'fas fa-microphone-slash';
+            micBtn.title = 'Click to stop listening';
+        } else {
+            micBtn.classList.remove('listening');
+            micIcon.className = 'fa-solid fa-microphone';
+            micBtn.title = 'Click to start voice input';
+        }
+    }
+
+    // ============ VOICE ANIMATIONS WITH ANIME.JS ============
+
+    showVoiceStatus(status = 'listening', text = '') {
+        this.removeVoiceStatus();
+
+        const template = document.getElementById('voice-status-template');
+        const voiceStatus = template.content.cloneNode(true);
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message bot voice-status`;
+        messageDiv.appendChild(voiceStatus);
+
+        const voiceStatusMsg = messageDiv.querySelector('.voice-status-message');
+        voiceStatusMsg.classList.add(status);
+
+        const statusText = messageDiv.querySelector('#voice-status-text');
+        if (statusText) {
+            statusText.textContent = text;
+        }
+
+        this.chatContainer.appendChild(messageDiv);
+        this.voiceStatusElement = messageDiv;
+        this.scrollToBottom();
+    }
+
+    updateVoiceStatus(status = 'listening', text = '') {
+        if (!this.voiceStatusElement) return;
+
+        const voiceStatusMsg = this.voiceStatusElement.querySelector('.voice-status-message');
+        voiceStatusMsg.className = 'voice-status-message ' + status;
+
+        const statusText = this.voiceStatusElement.querySelector('#voice-status-text');
+        if (statusText) {
+            statusText.textContent = text;
+        }
+    }
+
+    updateVoiceTranscript(text) {
+        if (!this.voiceStatusElement) return;
+
+        const transcriptEl = this.voiceStatusElement.querySelector('#voice-transcript');
+        if (transcriptEl) {
+            transcriptEl.textContent = text;
+        }
+    }
+
+    removeVoiceStatus() {
+        if (this.voiceStatusElement) {
+            this.voiceStatusElement.remove();
+            this.voiceStatusElement = null;
+        }
+        this.stopVoiceAnimation();
+    }
+
+    startVoiceAnimation() {
+        if (!window.anime || !this.voiceStatusElement) return;
+
+        const bars = this.voiceStatusElement.querySelectorAll('.voice-bar');
+
+        // Stop existing animation
+        if (this.voiceAnimation) {
+            this.voiceAnimation.pause();
+        }
+
+        // Create smooth wave animation
+        this.voiceAnimation = anime({
+            targets: bars,
+            height: [
+                { value: '15px', duration: 300, easing: 'easeInOutSine' },
+                { value: '30px', duration: 300, easing: 'easeInOutSine' },
+                { value: '15px', duration: 300, easing: 'easeInOutSine' }
+            ],
+            opacity: [
+                { value: 0.6, duration: 300 },
+                { value: 1, duration: 300 },
+                { value: 0.6, duration: 300 }
+            ],
+            delay: anime.stagger(80, { start: 100 }),
+            loop: true,
+            easing: 'easeInOutSine'
+        });
+    }
+
+    stopVoiceAnimation() {
+        if (this.voiceAnimation) {
+            this.voiceAnimation.pause();
+            this.voiceAnimation = null;
+        }
+
+        // Reset bars to default height
+        if (this.voiceStatusElement) {
+            const bars = this.voiceStatusElement.querySelectorAll('.voice-bar');
+            bars.forEach(bar => {
+                anime({
+                    targets: bar,
+                    height: '10px',
+                    opacity: 0.5,
+                    duration: 200,
+                    easing: 'easeOutSine'
+                });
+            });
+        }
+    }
+
+    // ============ CHAT MESSAGING ============
 
     async sendMessage() {
         const message = this.userInput.value.trim();
         if (!message) return;
+
+        // Stop voice if active
+        if (this.isListening) {
+            // Clear silence timer
+            if (this.silenceTimer) {
+                clearTimeout(this.silenceTimer);
+                this.silenceTimer = null;
+            }
+            this.stopVoiceRecognition();
+            this.removeVoiceStatus();
+        }
 
         this.addMessage(message, 'user');
         this.userInput.value = '';
@@ -102,17 +405,11 @@ class HotelChatbot {
                 this.conversationHistory = data.conversationHistory || [];
                 this.updateDataBanner(data.dataSource);
 
-                // Check if we should show date picker
                 if (data.showDatePicker && !this.hasDatesInMessage(message)) {
-                    // Add bot's initial response
                     this.addMessage(data.reply, 'bot');
-                    // Then add the date picker
                     this.showInlineDatePicker();
                 } else {
-                    // Normal response or user already provided dates
                     this.addMessage(data.reply, 'bot');
-
-                    // Remove any existing date picker if dates were provided
                     if (this.hasDatesInMessage(message) && this.currentDatePicker) {
                         this.currentDatePicker.remove();
                         this.currentDatePicker = null;
@@ -132,162 +429,8 @@ class HotelChatbot {
         }
     }
 
-    hasDatesInMessage(message) {
-        // Check for YYYY-MM-DD format
-        const datePattern = /\d{4}-\d{2}-\d{2}/g;
-        const dates = message.match(datePattern);
-
-        // Also check for date range input format (common in date pickers)
-        const dateRangePattern = /\d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/g;
-        const dateRangeMatch = message.match(dateRangePattern);
-
-        // Check for "from X to Y" pattern
-        const fromToPattern = /from \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/gi;
-        const fromToMatch = message.match(fromToPattern);
-
-        return (dates && dates.length >= 2) || dateRangeMatch || fromToMatch;
-    }
-
-    shouldShowDatePicker(userMessage, botResponse) {
-        const userTriggers = [
-            'available', 'availability', 'book', 'booking', 'reserve', 'reservation',
-            'room', 'price', 'cost', 'check', 'looking for'
-        ];
-
-        const botTriggers = [
-            'dates', 'check-in', 'check-out', 'select dates', 'when would you like',
-            'please provide', 'what dates', 'duration of stay'
-        ];
-
-        const userMsg = userMessage.toLowerCase();
-        const botMsg = botResponse.toLowerCase();
-
-        // Check if user mentioned booking/availability
-        const hasUserTrigger = userTriggers.some(trigger => userMsg.includes(trigger));
-
-        // Check if bot is asking for dates
-        const hasBotTrigger = botTriggers.some(trigger => botMsg.includes(trigger));
-
-        return hasUserTrigger || hasBotTrigger;
-    }
-
-    showInlineDatePicker() {
-        // Remove any existing date picker
-        if (this.currentDatePicker) {
-            this.currentDatePicker.remove();
-        }
-
-        // Clean up previous flatpickr instance
-        if (this.flatpickrInstance) {
-            this.flatpickrInstance.destroy();
-            this.flatpickrInstance = null;
-        }
-
-        // Get template
-        const template = document.getElementById('date-picker-template');
-        const datePicker = template.content.cloneNode(true);
-
-        // Create message div for date picker
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message bot';
-        messageDiv.appendChild(datePicker);
-
-        this.chatContainer.appendChild(messageDiv);
-        this.scrollToBottom();
-
-        // Store reference to current date picker
-        this.currentDatePicker = messageDiv;
-
-        // Setup event listeners for this date picker
-        this.setupDatePickerEvents(messageDiv);
-    }
-
-    setupDatePickerEvents(datePickerElement) {
-        const dateRangeInput = datePickerElement.querySelector('.date-range-input');
-        const roomBtns = datePickerElement.querySelectorAll('.room-type-btn');
-        const checkAvailabilityBtn = datePickerElement.querySelector('.check-availability-btn');
-
-        // Initialize flatpickr for date range
-        this.flatpickrInstance = flatpickr(dateRangeInput, {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            minDate: "today",
-            onChange: function (selectedDates, dateStr, instance) {
-                // This function can be used if you need to update something when dates change
-                console.log('Selected dates:', selectedDates);
-            }
-        });
-
-        // Auto-select first room
-        if (roomBtns.length > 0) {
-            roomBtns[0].classList.add('active');
-        }
-        let selectedRoomType = 'executive-view';
-
-        // Room selection
-        roomBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                roomBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedRoomType = btn.dataset.type;
-            });
-        });
-
-        // Check availability button click handler
-        checkAvailabilityBtn.addEventListener('click', () => {
-            const selectedDates = this.flatpickrInstance.selectedDates;
-            const roomType = selectedRoomType;
-
-            if (!selectedDates || selectedDates.length < 2) {
-                this.showToast('Please select a date range', 'error');
-                return;
-            }
-
-            // Format dates
-            const checkin = selectedDates[0].toISOString().split('T')[0];
-            const checkout = selectedDates[1].toISOString().split('T')[0];
-
-            // Calculate nights
-            const nights = Math.ceil((selectedDates[1] - selectedDates[0]) / (1000 * 60 * 60 * 24));
-
-            // Format room type text for display
-            const roomTypeText = this.formatRoomType(roomType);
-
-            // Format the query in a way that won't trigger date picker again
-            const query = `Check ${roomTypeText} availability from ${checkin} to ${checkout} for ${nights} nights`;
-
-            // Remove date picker BEFORE sending message
-            if (this.currentDatePicker) {
-                this.currentDatePicker.remove();
-                this.currentDatePicker = null;
-            }
-
-            // Clean up flatpickr
-            if (this.flatpickrInstance) {
-                this.flatpickrInstance.destroy();
-                this.flatpickrInstance = null;
-            }
-
-            // Send the query
-            this.userInput.value = query;
-            this.sendMessage();
-        });
-    }
-
-    formatRoomType(roomType) {
-        const roomTypes = {
-            'executive-view': 'Executive Suite View',
-            'executive-non-view': 'Executive Suite Non-View',
-            'family-view': 'Family Suite View',
-            'family-non-view': 'Family Suite Non-View',
-            'junior-view': 'Junior Suite View',
-            'junior-non-view': 'Junior Suite Non-View'
-        };
-        return roomTypes[roomType] || roomType;
-    }
-
     addMessage(text, sender) {
-        // Only remove welcome message for user messages
+        // Remove welcome message for user messages
         if (sender === 'user') {
             const welcomeMsg = this.chatContainer.querySelector('.welcome-message');
             if (welcomeMsg) {
@@ -295,8 +438,8 @@ class HotelChatbot {
             }
         }
 
-        // Skip if this is a date picker message
-        if (text.includes('chat-date-picker') || sender === 'date-picker') {
+        // Skip if this is a voice status message
+        if (text.includes('voice-status') || sender === 'voice-status') {
             return;
         }
 
@@ -328,6 +471,139 @@ class HotelChatbot {
         return text;
     }
 
+    // ============ DATE PICKER ============
+
+    showInlineDatePicker() {
+        if (this.currentDatePicker) {
+            this.currentDatePicker.remove();
+        }
+
+        if (this.flatpickrInstance) {
+            this.flatpickrInstance.destroy();
+            this.flatpickrInstance = null;
+        }
+
+        const template = document.getElementById('date-picker-template');
+        const datePicker = template.content.cloneNode(true);
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot';
+        messageDiv.appendChild(datePicker);
+
+        this.chatContainer.appendChild(messageDiv);
+        this.scrollToBottom();
+        this.currentDatePicker = messageDiv;
+
+        this.setupDatePickerEvents(messageDiv);
+    }
+
+    setupDatePickerEvents(datePickerElement) {
+        const dateRangeInput = datePickerElement.querySelector('.date-range-input');
+        const roomBtns = datePickerElement.querySelectorAll('.room-type-btn');
+        const checkAvailabilityBtn = datePickerElement.querySelector('.check-availability-btn');
+
+        // Initialize flatpickr
+        this.flatpickrInstance = flatpickr(dateRangeInput, {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+        });
+
+        // Auto-select first room
+        if (roomBtns.length > 0) {
+            roomBtns[0].classList.add('active');
+        }
+        let selectedRoomType = 'executive-view';
+
+        roomBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                roomBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedRoomType = btn.dataset.type;
+            });
+        });
+
+        checkAvailabilityBtn.addEventListener('click', () => {
+            const selectedDates = this.flatpickrInstance.selectedDates;
+            const roomType = selectedRoomType;
+
+            if (!selectedDates || selectedDates.length < 2) {
+                this.showToast('Please select a date range', 'error');
+                return;
+            }
+
+            const checkin = selectedDates[0].toISOString().split('T')[0];
+            const checkout = selectedDates[1].toISOString().split('T')[0];
+            const nights = Math.ceil((selectedDates[1] - selectedDates[0]) / (1000 * 60 * 60 * 24));
+
+            const query = `Check ${this.formatRoomType(roomType)} availability from ${checkin} to ${checkout} for ${nights} nights`;
+
+            if (this.currentDatePicker) {
+                this.currentDatePicker.remove();
+                this.currentDatePicker = null;
+            }
+
+            if (this.flatpickrInstance) {
+                this.flatpickrInstance.destroy();
+                this.flatpickrInstance = null;
+            }
+
+            this.userInput.value = query;
+            this.sendMessage();
+        });
+    }
+
+    formatRoomType(roomType) {
+        const roomTypes = {
+            'executive-view': 'Executive Suite View',
+            'executive-non-view': 'Executive Suite Non-View',
+            'family-view': 'Family Suite View',
+            'family-non-view': 'Family Suite Non-View',
+            'junior-view': 'Junior Suite View',
+            'junior-non-view': 'Junior Suite Non-View'
+        };
+        return roomTypes[roomType] || roomType;
+    }
+
+    hasDatesInMessage(message) {
+        const datePattern = /\d{4}-\d{2}-\d{2}/g;
+        const dates = message.match(datePattern);
+        const dateRangePattern = /\d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/g;
+        const dateRangeMatch = message.match(dateRangePattern);
+        const fromToPattern = /from \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/gi;
+        const fromToMatch = message.match(fromToPattern);
+
+        return (dates && dates.length >= 2) || dateRangeMatch || fromToMatch;
+    }
+
+    // ============ UTILITY METHODS ============
+
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Space or Alt+V to toggle voice
+            if ((e.ctrlKey && e.code === 'Space') || (e.altKey && e.code === 'KeyV')) {
+                e.preventDefault();
+                this.toggleVoiceRecognition();
+            }
+
+            // Escape to stop voice
+            if (e.code === 'Escape' && this.isListening) {
+                this.stopVoiceRecognition();
+            }
+
+            // Enter to send message
+            if (e.code === 'Enter' && !e.shiftKey && this.userInput.value.trim()) {
+                if (this.isListening) {
+                    this.stopVoiceRecognition();
+                }
+                setTimeout(() => {
+                    this.sendMessage();
+                }, 100);
+                e.preventDefault();
+            }
+        });
+    }
+
     showTyping() {
         this.typingIndicator.style.display = 'flex';
         this.scrollToBottom();
@@ -345,30 +621,54 @@ class HotelChatbot {
 
     clearChat() {
         if (confirm('Are you sure you want to clear the chat?')) {
-            // Clean up flatpickr instance if exists
             if (this.flatpickrInstance) {
                 this.flatpickrInstance.destroy();
                 this.flatpickrInstance = null;
             }
 
-            // Clear current date picker
             if (this.currentDatePicker) {
                 this.currentDatePicker.remove();
                 this.currentDatePicker = null;
             }
 
+            if (this.isListening) {
+                // Clear silence timer
+                if (this.silenceTimer) {
+                    clearTimeout(this.silenceTimer);
+                    this.silenceTimer = null;
+                }
+                this.stopVoiceRecognition();
+            }
+
+            this.removeVoiceStatus();
+
             this.chatContainer.innerHTML = `
-                <div class="welcome-message">
-                    <div class="welcome-icon">
-                        <i class="fas fa-hotel"></i>
-                    </div>
-                    <h2>Welcome Back!</h2>
-                    <p>Chat cleared. How can I help you today?</p>
+            <div class="welcome-message">
+                <div class="welcome-icon">
+                    <i class="fas fa-hotel"></i>
                 </div>
-            `;
+                <h2>Welcome Back!</h2>
+                <p>Chat cleared. How can I help you today?</p>
+            </div>
+        `;
             this.conversationHistory = [];
             this.showToast('Chat cleared successfully');
         }
+    }
+
+    toggleQuickActions() {
+        const quickActions = document.getElementById('quick-actions');
+        quickActions.style.display =
+            quickActions.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    closeChat() {
+        const container = document.getElementById('chat-container-main');
+        const toggleBtn = document.getElementById('chat-toggle-btn');
+
+        container.classList.remove('open');
+        toggleBtn.innerHTML = '<i class="fa-brands fa-uncharted"></i>';
+        this.showToast('Chat closed. Click the icon to open again.');
     }
 
     async refreshData() {
@@ -395,12 +695,6 @@ class HotelChatbot {
         }
     }
 
-    toggleQuickActions() {
-        const quickActions = document.getElementById('quick-actions');
-        quickActions.style.display =
-            quickActions.style.display === 'none' ? 'grid' : 'none';
-    }
-
     updateDataBanner(dataSource) {
         const banner = document.getElementById('data-banner');
         const bannerText = document.getElementById('banner-text');
@@ -417,7 +711,6 @@ class HotelChatbot {
     }
 
     showToast(message, type = 'success') {
-        // Create toast element if it doesn't exist
         let toast = document.getElementById('toast');
         if (!toast) {
             toast = document.createElement('div');
@@ -429,7 +722,7 @@ class HotelChatbot {
             `;
             document.body.appendChild(toast);
         }
-        
+
         const toastMessage = document.getElementById('toast-message');
         const icon = toast.querySelector('i');
 
@@ -448,6 +741,7 @@ class HotelChatbot {
     }
 }
 
+// Initialize chatbot when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new HotelChatbot();
 });

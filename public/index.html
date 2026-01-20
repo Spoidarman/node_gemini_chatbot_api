@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Anime.js for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 </head>
 
 <body>
@@ -87,68 +90,110 @@
             <div class="typing-dot"></div>
         </div>
 
-        <!-- Chat Input -->
-        <div class="chat-input-container">
-            <div class="input-wrapper">
-                <button class="attach-btn" title="Quick Actions">
-                    <i class="fas fa-plus"></i>
-                </button>
-                <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off" />
-                <button class="send-btn" id="send-btn">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-            <div class="quick-actions" id="quick-actions" style="display: none;">
-                <button class="quick-action" data-message="Show available rooms">
-                    <i class="fas fa-door-open"></i> Available Rooms
-                </button>
-                <button class="quick-action" data-message="What are your room rates?">
-                    <i class="fas fa-tags"></i> Room Rates
-                </button>
-                <button class="quick-action" data-message="I want to book a room from 2026-01-20 to 2026-01-22">
-                    <i class="fas fa-calendar-plus"></i> Book Now
-                </button>
-                <button class="quick-action" data-message="What are your check-in and check-out times?">
-                    <i class="fas fa-clock"></i> Timings
-                </button>
-            </div>
-        </div>
-    </div>
-    <template id="date-picker-template">
-    <div class="chat-date-picker compact">
-        <div class="date-range-section">
-            <div class="date-range-label">
-                <i class="fas fa-calendar-day"></i>
-                <span>Dates*</span>
-            </div>
-            <input type="text" class="date-range-input compact-input" id="date-range-input"
-                   placeholder="Click to select dates">
-        </div>
-        <div class="room-type-section">
-            <div class="room-type-label">
-                <i class="fas fa-bed"></i>
-                <span>Room Type:</span>
-            </div>
-            <div class="room-grid compact-grid">
-                <button class="room-type-btn compact-btn" data-type="executive-view">Executive View</button>
-                <button class="room-type-btn compact-btn" data-type="executive-non-view">Executive Non-View</button>
-                <button class="room-type-btn compact-btn" data-type="family-view">Family View</button>
-                <button class="room-type-btn compact-btn" data-type="family-non-view">Family Non-View</button>
-                <button class="room-type-btn compact-btn" data-type="junior-view">Junior View</button>
-                <button class="room-type-btn compact-btn" data-type="junior-non-view">Junior Non-View</button>
-            </div>
-        </div>
-        <div class="check-availability-container">
-            <button class="check-availability-btn">
-                <i class="fas fa-search"></i>
-                <span>Check Availability</span>
-            </button>
-        </div>
-    </div>
-</template>
+        
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <button class="attach-btn" title="Quick Actions">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off" />
+                    <button class="mic-btn" id="mic-btn" title="Start voice input">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <button class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="quick-actions" id="quick-actions" style="display: none;">
+                    <button class="quick-action" data-message="Show available rooms">
+                        <i class="fas fa-door-open"></i> Available Rooms
+                    </button>
+                    <button class="quick-action" data-message="What are your room rates?">
+                        <i class="fas fa-tags"></i> Room Rates
+                    </button>
+                    <button class="quick-action" data-message="I want to book a room from 2026-01-20 to 2026-01-22">
+                        <i class="fas fa-calendar-plus"></i> Book Now
+                    </button>
+                    <button class="quick-action" data-message="What are your check-in and check-out times?">
+                        <i class="fas fa-clock"></i> Timings
+                    </button>
+                </div>
 
-    <script src="/js/chat.js"></script>
+                <!-- Terms and Conditions Section -->
+                <div class="terms-container">
+                    <p class="terms-text">
+                        By messaging, you agree to the
+                        <a href="https://policies.google.com/terms" target="_blank" class="terms-link">Google Terms</a>
+                        &
+                        <a href="https://policies.google.com/privacy" target="_blank" class="terms-link">Google Privacy
+                            Policy</a>.
+                        AI can make mistakes, so double-check the results or
+                        <a href="https://hotelcanopy.com/contact/" target="_blank" class="terms-link">Contact Us</a> for
+                        confirmation.
+                    </p>
+                </div>
+            </div>
+    </div>
+
+    <!-- Templates -->
+    <template id="date-picker-template">
+        <div class="chat-date-picker compact">
+            <div class="date-range-section">
+                <div class="date-range-label">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Dates*</span>
+                </div>
+                <input type="text" class="date-range-input compact-input" id="date-range-input"
+                    placeholder="Click to select dates">
+            </div>
+            <div class="room-type-section">
+                <div class="room-type-label">
+                    <i class="fas fa-bed"></i>
+                    <span>Room Type:</span>
+                </div>
+                <div class="room-grid compact-grid">
+                    <button class="room-type-btn compact-btn" data-type="executive-view">Executive View</button>
+                    <button class="room-type-btn compact-btn" data-type="executive-non-view">Executive Non-View</button>
+                    <button class="room-type-btn compact-btn" data-type="family-view">Family View</button>
+                    <button class="room-type-btn compact-btn" data-type="family-non-view">Family Non-View</button>
+                    <button class="room-type-btn compact-btn" data-type="junior-view">Junior View</button>
+                    <button class="room-type-btn compact-btn" data-type="junior-non-view">Junior Non-View</button>
+                </div>
+            </div>
+            <div class="check-availability-container">
+                <button class="check-availability-btn">
+                    <i class="fas fa-search"></i>
+                    <span>Check Availability</span>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <template id="voice-status-template">
+        <div class="voice-status-message">
+            <div class="voice-status-header">
+                <div class="voice-status-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <div class="voice-status-title">Voice Input Active</div>
+            </div>
+            <div class="voice-visualizer">
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+            </div>
+            <div class="voice-status-text" id="voice-status-text">Listening... Speak now</div>
+            <div class="voice-transcript" id="voice-transcript"></div>
+        </div>
+    </template>
+
+    <!-- External Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/js/chat.js"></script>
 </body>
 
 </html>
